@@ -5,18 +5,46 @@ import org.springframework.stereotype.Service;
 
 import cl.duoc.bs_ventas_bs.clients.PedidoBsFeignClient;
 import cl.duoc.bs_ventas_bs.clients.ProductoBsFeignClient;
+import cl.duoc.bs_ventas_bs.clients.WebPayFeignClient;
 import cl.duoc.bs_ventas_bs.model.dto.DetallePedidoDTO;
 import cl.duoc.bs_ventas_bs.model.dto.PedidoDTO;
 import cl.duoc.bs_ventas_bs.model.dto.ProductoDTO;
-
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransacionDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionQueryResponseDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionRequestDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionResponseDTO;
+import lombok.extern.log4j.Log4j2;
 
 @Service
+@Log4j2
 public class VentasService {
     @Autowired
     PedidoBsFeignClient pedidoBsFeignClient;
 
     @Autowired
     ProductoBsFeignClient productoBsFeignClient;
+
+    @Autowired
+    private WebPayFeignClient webPayFeignClient;
+
+public WebPayTransactionResponseDTO createPedidoTransaction(PedidoDTO pedidoDTO) {
+    log.info("PedidoDTO: {}", pedidoDTO);
+    WebPayTransactionRequestDTO webPayTransactionRequestDTO = new WebPayTransactionRequestDTO("00001",pedidoDTO.getId().toString(),pedidoDTO.getTotal().intValue(),"dsa");
+        WebPayTransactionResponseDTO webPayTransactionResponseDTO = webPayFeignClient.generateTransaction("597055555532", "579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C", webPayTransactionRequestDTO);
+        return webPayTransactionResponseDTO;
+}
+
+public String confirmPedidoTransaction(WebPayTransacionDTO webPayTransacionDTO) {
+    String response = webPayFeignClient.confirmTransaction("597055555532","579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C",webPayTransacionDTO.getToken());
+    log.info("confirmPedidoTransaction: {}", response);
+    return response;
+}
+
+public WebPayTransactionQueryResponseDTO queryPedidoTransaction(WebPayTransacionDTO webPayTransacionDTO) {
+    WebPayTransactionQueryResponseDTO response = webPayFeignClient.queryTransaction("597055555532","579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C",webPayTransacionDTO.getToken());
+    log.info("queryPedidoTransaction: {}", response);
+    return response;
+}
 
     public PedidoDTO findPedidoById(Long id){
         PedidoDTO pedidoDTO = pedidoBsFeignClient.findPedidoById(id).getBody();
@@ -27,5 +55,19 @@ public class VentasService {
         }
         return pedidoDTO;
     }
+
+    public PedidoDTO insertPedido(PedidoDTO pedidoDTO) {
+    PedidoDTO dto = pedidoBsFeignClient.insertPedido(pedidoDTO).getBody();
+
+    for (DetallePedidoDTO detallePedidoDTO : dto.getDetalles()) {
+        Long productoId = detallePedidoDTO.getProducto().getIdProducto();
+        ProductoDTO producto = productoBsFeignClient.findProductById(productoId).getBody();
+        detallePedidoDTO.setProducto(producto);
+    }
+
+    return dto;
+}
+
+
 
 }

@@ -15,14 +15,9 @@ import lombok.ToString;
 public class ClienteDTO {
 
     private Long id;
-
     private String nombre;
-
     private String contrasena;
-
     private String direccion;
-
     private String email;
-
     private String telefono;
 }

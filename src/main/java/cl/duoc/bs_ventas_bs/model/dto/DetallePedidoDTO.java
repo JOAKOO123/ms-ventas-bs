@@ -16,12 +16,8 @@ import lombok.ToString;
 public class DetallePedidoDTO {
 
     private Long id;
-
     private PedidoDTO pedidoId;
-
     private ProductoDTO producto;
-
     private Integer cantidad;
-
     private BigDecimal precioUnitario;
 }

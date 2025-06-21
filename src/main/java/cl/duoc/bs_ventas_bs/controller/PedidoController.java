@@ -7,10 +7,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.duoc.bs_ventas_bs.model.dto.PedidoDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransacionDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionQueryResponseDTO;
 import cl.duoc.bs_ventas_bs.service.VentasService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -26,6 +31,29 @@ public class PedidoController {
                                      new ResponseEntity<>(HttpStatus.NOT_FOUND);     
                                         
     }
+
+    @PostMapping("")
+public ResponseEntity<PedidoDTO> createPedido(@RequestBody PedidoDTO pedidoDTO) {
+    PedidoDTO newPedido = ventasService.insertPedido(pedidoDTO);
+    return (newPedido != null) ?
+           new ResponseEntity<>(newPedido, HttpStatus.CREATED) :
+           new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+}
+
+@PostMapping("/webpay/confirm")
+public ResponseEntity<String> confirmWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
+    String result = ventasService.confirmPedidoTransaction(webPayTransacionDTO);
+    return ResponseEntity.ok(result);
+}
+
+@PostMapping("/webpay/query")
+public ResponseEntity<WebPayTransactionQueryResponseDTO> queryWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
+    WebPayTransactionQueryResponseDTO result = ventasService.queryPedidoTransaction(webPayTransacionDTO);
+    return ResponseEntity.ok(result);
+}
+
+
+
     
 
 }
