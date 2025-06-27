@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.duoc.bs_ventas_bs.model.dto.PedidoDTO;
 import cl.duoc.bs_ventas_bs.model.dto.WebPayTransacionDTO;
 import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionQueryResponseDTO;
+import cl.duoc.bs_ventas_bs.model.dto.WebPayTransactionResponseDTO;
 import cl.duoc.bs_ventas_bs.service.VentasService;
+import lombok.extern.log4j.Log4j2;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/pedidos")
+@Log4j2
 public class PedidoController {
 
     @Autowired
@@ -28,21 +31,18 @@ public class PedidoController {
     public ResponseEntity<PedidoDTO> findPedidoById(@PathVariable("id") Long id) {
         PedidoDTO pedidoDTO = ventasService.findPedidoById(id);
         return (pedidoDTO != null)?  new ResponseEntity<>(pedidoDTO, HttpStatus.OK) :
-                                     new ResponseEntity<>(HttpStatus.NOT_FOUND);     
-                                        
+                                     new ResponseEntity<>(HttpStatus.NOT_FOUND);                                           
     }
 
-    @PostMapping("")
-public ResponseEntity<PedidoDTO> createPedido(@RequestBody PedidoDTO pedidoDTO) {
-    PedidoDTO newPedido = ventasService.insertPedido(pedidoDTO);
-    return (newPedido != null) ?
-           new ResponseEntity<>(newPedido, HttpStatus.CREATED) :
-           new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-}
+    @PostMapping("/sas")
+    public WebPayTransactionResponseDTO createPedidoTransaction(@RequestBody PedidoDTO pedidoDTO) {
+        log.error("PedidoDTO: {}", pedidoDTO);
+        return ventasService.createPedidoTransaction(pedidoDTO);
+    }     
 
 @PostMapping("/webpay/confirm")
-public ResponseEntity<String> confirmWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
-    String result = ventasService.confirmPedidoTransaction(webPayTransacionDTO);
+public ResponseEntity<WebPayTransactionQueryResponseDTO> confirmWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
+    WebPayTransactionQueryResponseDTO result = ventasService.confirmPedidoTransaction(webPayTransacionDTO);
     return ResponseEntity.ok(result);
 }
 

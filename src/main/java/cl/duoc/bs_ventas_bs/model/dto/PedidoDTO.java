@@ -4,9 +4,6 @@ package cl.duoc.bs_ventas_bs.model.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,18 +18,12 @@ import lombok.ToString;
 
 public class PedidoDTO {
     
-    @JsonProperty(value="id")
-    private Long id;
-    @JsonProperty(value="cliente_id")
-    private ClienteDTO clienteId;
-    @JsonProperty(value="fecha")
+    private Long id_pedido;
+    private Long cliente_id;
+    private ClienteDTO cliente;
     private String fecha;
-    @JsonProperty(value="estado")
     private String estado;
-    @JsonProperty(value="total")
     private BigDecimal total;
-    @JsonProperty(value="decuento_id")
-    private Integer descuentoId;
-    @JsonProperty(value="detalles")
+    private Integer descuento_id;
     private List<DetallePedidoDTO> detalles;
 }

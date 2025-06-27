@@ -17,6 +17,6 @@ public class ProductoDTO {
     private String descripcion;
     private BigDecimal precio;
     private Integer stock;
-    private ProveedorDTO proveedorDTO;
+    private ProveedorDTO proveedor;
 
 }
