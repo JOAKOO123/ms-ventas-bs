@@ -2,7 +2,6 @@ package cl.duoc.bs_ventas_bs.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Getter

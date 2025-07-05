@@ -24,9 +24,9 @@ public class ClienteDTO {
     @Schema(description = "Dirección del cliente", example = "Av. Siempre Viva 742")
     private String direccion;
 
-    @Schema(description = "Correo electrónico del cliente", example = "juan.perez@example.com")
+    @Schema(description = "Correo electrónico del cliente", example = "juan.azocarz@exmaple.com")
     private String email;
 
-    @Schema(description = "Número de teléfono del cliente", example = "+56912345678")
+    @Schema(description = "Número de teléfono del cliente", example = "+5693712376")
     private String telefono;
 }
