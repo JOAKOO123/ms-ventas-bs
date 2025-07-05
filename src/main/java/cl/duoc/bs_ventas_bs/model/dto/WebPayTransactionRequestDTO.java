@@ -13,17 +13,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-
 public class WebPayTransactionRequestDTO {
-
     @JsonProperty("buy_order")
     private String buyOrder;
     @JsonProperty("session_id")
     private String sessionId;
     @JsonProperty("amount")
-    private int    amount;
+    private int amount;
     @JsonProperty("return_url")
     private String returnUrl;
-
-
 }
+

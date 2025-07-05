@@ -18,42 +18,52 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/pedidos")
 @Log4j2
+@Tag(name = "Pedidos", description = "API para gestionar pedidos y transacciones WebPay")
 public class PedidoController {
 
     @Autowired
-    VentasService ventasService;
+    private VentasService ventasService;
+
+    @Operation(summary = "Obtiene un pedido por su ID")
     @GetMapping("/{id}")
     public ResponseEntity<PedidoDTO> findPedidoById(@PathVariable("id") Long id) {
         PedidoDTO pedidoDTO = ventasService.findPedidoById(id);
-        return (pedidoDTO != null)?  new ResponseEntity<>(pedidoDTO, HttpStatus.OK) :
-                                     new ResponseEntity<>(HttpStatus.NOT_FOUND);                                           
+        if (pedidoDTO != null) {
+            return ResponseEntity.ok(pedidoDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
+    @Operation(summary = "Crea una transacción de pedido para WebPay")
     @PostMapping("/sas")
-    public WebPayTransactionResponseDTO createPedidoTransaction(@RequestBody PedidoDTO pedidoDTO) {
-        log.error("PedidoDTO: {}", pedidoDTO);
-        return ventasService.createPedidoTransaction(pedidoDTO);
-    }     
+    public ResponseEntity<WebPayTransactionResponseDTO> createPedidoTransaction(@RequestBody PedidoDTO pedidoDTO) {
+        log.info("Creando transacción para pedido: {}", pedidoDTO);
+        WebPayTransactionResponseDTO response = ventasService.createPedidoTransaction(pedidoDTO);
+        if (response != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-@PostMapping("/webpay/confirm")
-public ResponseEntity<WebPayTransactionQueryResponseDTO> confirmWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
-    WebPayTransactionQueryResponseDTO result = ventasService.confirmPedidoTransaction(webPayTransacionDTO);
-    return ResponseEntity.ok(result);
-}
+    @Operation(summary = "Confirma una transacción WebPay")
+    @PostMapping("/webpay/confirm")
+    public ResponseEntity<WebPayTransactionQueryResponseDTO> confirmWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
+        WebPayTransactionQueryResponseDTO result = ventasService.confirmPedidoTransaction(webPayTransacionDTO);
+        return ResponseEntity.ok(result);
+    }
 
-@PostMapping("/webpay/query")
-public ResponseEntity<WebPayTransactionQueryResponseDTO> queryWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
-    WebPayTransactionQueryResponseDTO result = ventasService.queryPedidoTransaction(webPayTransacionDTO);
-    return ResponseEntity.ok(result);
-}
-
-
-
-    
-
+    @Operation(summary = "Consulta una transacción WebPay")
+    @PostMapping("/webpay/query")
+    public ResponseEntity<WebPayTransactionQueryResponseDTO> queryWebPayTransaction(@RequestBody WebPayTransacionDTO webPayTransacionDTO) {
+        WebPayTransactionQueryResponseDTO result = ventasService.queryPedidoTransaction(webPayTransacionDTO);
+        return ResponseEntity.ok(result);
+    }
 }
